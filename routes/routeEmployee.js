@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const employeeController = require('../controllers/employeeController');
 const authenticateJWT = require('../middlewares/authenticateJWT')
-
-
 /**
  * @swagger
  * /employees:
@@ -111,11 +109,7 @@ const authenticateJWT = require('../middlewares/authenticateJWT')
  *         role: "User"
  */
 
-
-
-
 // Các route CRUD chính ở đây (ví dụ: router.post('/', employeeController.createEmployee); ...)
-
 
 /**
  * @swagger
@@ -158,28 +152,8 @@ const authenticateJWT = require('../middlewares/authenticateJWT')
  *       400:
  *         description: Invalid or expired token
  *
- * /employees/login:
- *   post:
- *     summary: Login for employee
- *     tags: [Employee]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               username:
- *                 type: string
- *               password:
- *                 type: string
- *     responses:
- *       200:
- *         description: Login successful
- *       400:
- *         description: Invalid credentials
- */
 
+ */
 
 /**
  * @swagger
@@ -217,8 +191,6 @@ const authenticateJWT = require('../middlewares/authenticateJWT')
  *         description: Server error
  */
 
-
-// Đảm bảo các route đặc biệt nằm sau các route CRUD chính
 router.delete('/:id', employeeController.deleteEmployee);
 router.get('/', employeeController.getAllEmployees);
 router.get('/:id', employeeController.getEmployeeById);

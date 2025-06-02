@@ -19,11 +19,11 @@ app.use(express.json());
 const cors = require('cors');
 app.use(cors());
 
-const employeeRoutes = require('./routes/employees');
+const employeeRoutes = require('./routes/routeEmployee');
 const accessCodeRoutes = require('./routes/accessCode');
-const adminRoutes = require('./routes/admin');
-const userRoutes = require('./routes/user');
-const messageRoutes = require('./routes/message');
+const adminRoutes = require('./routes/routeAdmin');
+const userRoutes = require('./routes/routeUser');
+const messageRoutes = require('./routes/routeMessage');
 app.use('/messages', messageRoutes)
 app.use('/admin', adminRoutes);
 app.use('/access-code', accessCodeRoutes);

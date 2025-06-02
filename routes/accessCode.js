@@ -13,7 +13,7 @@ const AccessCode = require('../models/AccessCode');
  *           type: string
  *       example:
  *         phoneNumber: "0362685068"
- 
+
 
  * /access-code:
  *   post:
@@ -30,7 +30,6 @@ const AccessCode = require('../models/AccessCode');
  *         description: Access code sent.
  *       400:
  *         description: Phone number is required.
- 
 
  * /access-code/verify:
  *   post:
@@ -57,7 +56,6 @@ const AccessCode = require('../models/AccessCode');
  *         description: Invalid or expired access code
  */
 
-
 function generateAccessCode() {
   return Math.floor(100000 + Math.random() * 900000).toString()
 }
@@ -78,7 +76,7 @@ router.post('/', async (req, res) => {
       { upsert: true, new: true }
     )
 
-    // Gửi SMS (ở đây chỉ log ra console)
+    // Gửi SMS log ra console
     console.log(`Gửi mã xác thực ${code} tới số điện thoại (mở console trong BE lên xem) ${phoneNumber}`)
     res.json({ message: 'Access code sent.' })
   } catch (err) {
