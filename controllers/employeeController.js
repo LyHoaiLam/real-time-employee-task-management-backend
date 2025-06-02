@@ -107,19 +107,34 @@ exports.setupAccount = async (req, res) => {
 }
 
 
+// exports.deleteEmployee = async (req, res) => {
+//   try {
+//     const { id } = req.params
+//     const deleted = await Employee.findByIdAndDelete(id)
+
+//     if (!deleted) {
+//       return res.status(404).json({ message: 'Employee not found' })
+//     }
+//     res.json({ message: 'Employee deleted successfully' })
+//   } catch (err) {
+//     res.status(500).json({ message: 'Server error', error: err.message })
+//   }
+// }
+
 exports.deleteEmployee = async (req, res) => {
   try {
-    const { id } = req.params
-    const deleted = await Employee.findByIdAndDelete(id)
-
-    if (!deleted) {
-      return res.status(404).json({ message: 'Employee not found' })
+    const { id } = req.params;
+    const employee = await Employee.findById(id);
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
     }
-    res.json({ message: 'Employee deleted successfully' })
+    await Employee.findByIdAndDelete(id);
+    await User.findOneAndDelete({ username: employee.username });
+    res.json({ message: 'Employee and associated user deleted successfully' });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message })
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
-}
+};
 
 
 exports.updateEmployee = async (req, res) => {

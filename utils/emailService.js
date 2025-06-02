@@ -1,8 +1,23 @@
+const nodemailer = require('nodemailer');
+require('dotenv').config();
+
 exports.sendVerificationEmail = async (to, verificationToken) => {
-  // Thay thế domain bằng domain thật của bạn khi deploy
-  const verificationUrl = `http://localhost:3000/employees/setup-account?token=${verificationToken}`;
-  // Ở đây chỉ log ra console, thực tế bạn nên dùng nodemailer để gửi email thật
-  console.log(`Gửi email xác minh tới ${to}: Nhấn vào link để xác minh tài khoản: ${verificationUrl}`);
-  // Nếu dùng nodemailer, hãy gửi email thật ở đây
-  return true;
-};
+  const verificationUrl = `http://localhost:3001/setUserAccount?token=${verificationToken}`; // Chú ý cổng 3002 và url frontend mới
+
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    }
+  });
+
+  const mailOptions = {
+    from: process.env.EMAIL_USER,
+    to,
+    subject: 'Xác thực tài khoản nhân viên',
+    html: `<p>Click vào link dưới để thiết lập tài khoản:</p><a href="${verificationUrl}">${verificationUrl}</a>`
+  };
+
+  await transporter.sendMail(mailOptions);
+}
