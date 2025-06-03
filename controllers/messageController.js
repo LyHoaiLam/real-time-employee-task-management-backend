@@ -1,43 +1,45 @@
-// controllers/messageController.js
 const Message = require('../models/Message');
 
-/**
- * POST /messages
- * body: { senderId, receiverId, content }
- * Lưu tin nhắn mới và trả về object message đã lưu.
- */
 exports.createMessage = async (req, res) => {
-  const { senderId, receiverId, content } = req.body;
-  if (!senderId || !receiverId || !content) {
-    return res.status(400).json({ message: 'senderId, receiverId và content đều bắt buộc.' });
+  const { senderId, receiverId, message } = req.body;
+
+  if (!senderId || !receiverId || !message) {
+    return res.status(400).json({ message: 'Missing fields' });
   }
+
   try {
-    const newMessage = await Message.create({ senderId, receiverId, content });
-    // TODO: emit qua socket nếu cần (socket.io instance có thể được inject vào controller)
-    return res.status(201).json(newMessage);
-  } catch (err) {
-    console.error('Error creating message:', err);
-    return res.status(500).json({ message: 'Lỗi server khi lưu tin nhắn.' });
+    const newMessage = new Message({
+      senderId,
+      receiverId,
+      content: message  // lưu vào trường content trong DB
+    });
+
+    await newMessage.save();
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
 
-/**
- * GET /messages/:userA/:userB
- * Lấy tất cả tin nhắn giữa userA và userB, sắp xếp theo sentAt
- */
-exports.getConversation = async (req, res) => {
-  const { userA, userB } = req.params;
+// Lấy lịch sử tin nhắn giữa 2 user (2 chiều)
+exports.getMessagesBetweenUsers = async (req, res) => {
   try {
-    const convo = await Message.find({
+    const { user1, user2 } = req.query; // lấy từ query param
+
+    if (!user1 || !user2) {
+      return res.status(400).json({ message: 'Missing user1 or user2 parameter' });
+    }
+
+    const messages = await Message.find({
       $or: [
-        { senderId: userA, receiverId: userB },
-        { senderId: userB, receiverId: userA }
+        { senderId: user1, receiverId: user2 },
+        { senderId: user2, receiverId: user1 }
       ]
-    })
-    .sort('sentAt');
-    return res.json(convo);
-  } catch (err) {
-    console.error('Error fetching conversation:', err);
-    return res.status(500).json({ message: 'Lỗi server khi lấy lịch sử chat.' });
+    }).sort({ createdAt: 1 }); // sắp xếp theo thời gian tăng dần
+
+    res.json(messages);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
