@@ -33,9 +33,10 @@ exports.getEmployeeById = async (req, res) => {
 
 exports.createEmployee = async (req, res) => {
   const verificationToken = crypto.randomBytes(32).toString('hex')
+  //Thời hạn hiệu lực của mã xác minh: hiện tại + 24 giờ. Dùng đơn vị milliseconds vì Date.now() trả về thời gian tính bằng ms.
   const verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000 // 24h
 
-  const employee = new Employee({
+  const employee = new Employee({ // Tạo object từ model Employee
     name: req.body.name,
     position: req.body.position,
     email: req.body.email,
@@ -46,7 +47,8 @@ exports.createEmployee = async (req, res) => {
   })
 
   try {
-    const newEmployee = await employee.save();
+    const newEmployee = await employee.save(); //Lưu đối tượng employee vào MongoDB.
+    // Gọi service gửi email (emailService) để gửi mã xác minh đến email nhân viên mới.
     await emailService.sendVerificationEmail(newEmployee.email, verificationToken)
 
     res.status(201).json({ 
@@ -139,12 +141,12 @@ exports.deleteEmployee = async (req, res) => {
 
 exports.updateEmployee = async (req, res) => {
   try {
-    const employeeId = req.params.id;
-    const updateData = req.body;
+    const employeeId = req.params.id; //Xác định nhân viên cần cập nhật thông qua req.params.id
+    const updateData = req.body;//Nhận dữ liệu mới từ req.body
 
-    if (updateData.task && typeof updateData.task.status === 'string') {
-      updateData.task = { status: updateData.task.status };
-    }
+    // if (updateData.task && typeof updateData.task.status === 'string') {
+    //   updateData.task = { status: updateData.task.status };
+    // }
     const updatedEmployee = await Employee.findByIdAndUpdate(employeeId, updateData, { new: true });
 
     if (!updatedEmployee) {
